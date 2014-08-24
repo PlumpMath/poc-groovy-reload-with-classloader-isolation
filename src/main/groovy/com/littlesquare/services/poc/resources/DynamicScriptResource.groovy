@@ -1,7 +1,10 @@
 package com.littlesquare.services.poc.resources
 
 import com.littlesquare.services.poc.ApplicationConfiguration
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,10 +20,13 @@ import java.util.concurrent.ConcurrentHashMap
 @RestController
 @RequestMapping(value = "/api/v1/dynamic")
 public class DynamicScriptResource {
+    private static final Logger LOG = LoggerFactory.getLogger(DynamicScriptResource)
+
     private final File scriptsDirectory
 
     // TODO-AJ potential for an LRU cache (eviction should free up perm gem?)
     private ConcurrentHashMap<String, GroovyClassLoader> cachedClassLoaders = [:]
+    private Map<String, Long> lastModifiedTimeByScript = [:]
 
     @Autowired
     DynamicScriptResource(ApplicationConfiguration configuration) {
@@ -33,11 +39,12 @@ public class DynamicScriptResource {
         def originalClassloader = Thread.currentThread().getContextClassLoader()
         try {
             def groovyClassLoader = new GroovyClassLoader()
-            def existingClassLoader = cachedClassLoaders.putIfAbsent("${scriptName}.groovy", groovyClassLoader)
+            scriptName = "${scriptName}.groovy" as String
+            def existingClassLoader = cachedClassLoaders.putIfAbsent(scriptName, groovyClassLoader)
             groovyClassLoader = existingClassLoader ?: groovyClassLoader
 
             Thread.currentThread().setContextClassLoader(groovyClassLoader)
-            Class groovyClass = groovyClassLoader.parseClass(new File(scriptsDirectory, "${scriptName}.groovy"))
+            Class groovyClass = groovyClassLoader.parseClass(new File(scriptsDirectory, scriptName))
 
             return [
                     results: [
@@ -69,5 +76,18 @@ public class DynamicScriptResource {
                     ]
                 }
         ]
+    }
+
+    @Scheduled(fixedDelay=15000L)
+    public void refreshScriptCache() {
+        scriptsDirectory.listFiles().collect { File file ->
+            def scriptName = file.name
+            if (lastModifiedTimeByScript[scriptName] < file.lastModified()) {
+                if (cachedClassLoaders.remove(scriptName)) {
+                    LOG.info("'${scriptName}' has been removed from script cache, will be reloaded on next request.")
+                }
+            }
+            lastModifiedTimeByScript[scriptName] = file.lastModified()
+        }
     }
 }

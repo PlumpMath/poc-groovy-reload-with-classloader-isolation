@@ -37,7 +37,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-security")
 
-    compile 'org.codehaus.groovy:groovy-all:2.3.6'
+    compile("org.codehaus.groovy:groovy-all:2.3.6")
     compile("org.apache.commons:commons-lang3:3.2.1")
     compile("com.google.guava:guava:16.0.1")
     compile("org.yaml:snakeyaml:1.13")

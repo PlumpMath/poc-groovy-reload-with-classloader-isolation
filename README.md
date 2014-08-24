@@ -10,9 +10,10 @@ An excuse to play around with Spring Boot and do a _very quick_ comparison of it
 - URL Generation (_ie. UriComponentsBuilder_)
 - Configuration Validation (_ie. JSR-303_)
 - Authentication (_ie. Spring Security Basic Auth_)
+- Task Scheduling
 
 #### Running
-
+    [ajordens@Phaeton]$ gradle wrapper
     [ajordens@Phaeton]$ ./gradlew bootRun
     [ajordens@Phaeton]$ curl http://localhost:8080/api/v1/dynamic
     {

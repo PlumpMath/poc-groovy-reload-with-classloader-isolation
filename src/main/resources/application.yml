@@ -4,3 +4,9 @@ scriptsDirectory: src/dist/scripts
 http:
   mappers:
     jsonPrettyPrint: true
+
+management:
+  port: 8081
+  address: 127.0.0.1
+  security:
+    enabled: false

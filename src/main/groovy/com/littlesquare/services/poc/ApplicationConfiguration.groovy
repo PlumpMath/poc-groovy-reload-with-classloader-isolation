@@ -21,7 +21,7 @@ class ApplicationConfiguration {
      * @return Custom object mapper (date formatting, etc.)
      */
     @Bean
-    public ObjectMapper getObjectMapper() {
+    public ObjectMapper objectMapper() {
         def objectMapper = new ObjectMapper()
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         return objectMapper
