@@ -1,0 +1,6 @@
+applicationName: POC-Groovy-Reload-With-ClassLoader-Isolation
+scriptsDirectory: src/dist/scripts
+
+http:
+  mappers:
+    jsonPrettyPrint: true

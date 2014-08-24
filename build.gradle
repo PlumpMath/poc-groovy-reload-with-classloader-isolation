@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.5.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'spring-boot'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://repo.spring.io/libs-release" }
+}
+
+version = '1.0'
+group = 'com.littlesquare.services.poc'
+description = 'POC Spring Boot App w/ Dynamic Groovy Script Support'
+
+project.ext {
+    springBootVersion = '1.1.5.RELEASE'
+}
+
+jar {
+    baseName = 'poc-groovy-reload-with-classloader-isolation'
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-security")
+
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
+    compile("org.apache.commons:commons-lang3:3.2.1")
+    compile("com.google.guava:guava:16.0.1")
+    compile("org.yaml:snakeyaml:1.13")
+
+    testCompile("junit:junit")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
